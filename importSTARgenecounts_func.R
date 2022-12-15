@@ -1,3 +1,6 @@
+# When running make sure to include the last slash in the data folder, for example: 
+# table <- importSTARgenecounts("/mnt/d/folder/")
+
 importSTARgenecounts <- function(data_folder) {
   
   library(tibble)

@@ -5,9 +5,6 @@
 
 importSTARgenecounts <- function(data_folder, strandedness) {
   
-  library(tibble)
-  library(readr)
-  
   # Pulls out files the Gene counts file names 
   files <- list.files(data_folder, pattern = ".*ReadsPerGene.out.tab",full.names = T, recursive = FALSE)
   
@@ -19,17 +16,17 @@ importSTARgenecounts <- function(data_folder, strandedness) {
   
   # This is a bit messy but does the job
   # It loads in the first values to make a tibble of the appropriate size
-  temp_STAR_table<-read_table(files[[1]],col_names = c('ensgene','total.mapped','for.mapped','rev.mapped'))
+  temp_STAR_table<-read.table(files[[1]],col.names = c('ensgene','total.mapped','for.mapped','rev.mapped'))
   
   # Then it loads in all the rest
   for (name in names(files)) {
     if (strandedness == 'reverse')
     {
-      temp_STAR_table[name] <- read_table(files[name],col_names = c('ensgene','total.mapped','for.mapped','rev.mapped'))$rev.mapped
+      temp_STAR_table[name] <- read.table(files[name],col.names = c('ensgene','total.mapped','for.mapped','rev.mapped'))$rev.mapped
       }
     else if (strandedness == 'forward')
     {
-      temp_STAR_table[name] <- read_table(files[name],col_names = c('ensgene','total.mapped','for.mapped','rev.mapped'))$for.mapped
+      temp_STAR_table[name] <- read.table(files[name],col.names = c('ensgene','total.mapped','for.mapped','rev.mapped'))$for.mapped
     }
     else
     {
@@ -42,6 +39,10 @@ importSTARgenecounts <- function(data_folder, strandedness) {
   
   # Then remove the N_data
   STAR_table <- STAR_table[-1:-4, ]
+  
+  # Make the index the gene names and remove it
+  rownames(STAR_table) <- STAR_table$ensgene
+  STAR_table$ensgene <- NULL
   
   return(STAR_table)
 }

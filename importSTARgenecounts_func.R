@@ -1,7 +1,9 @@
 # When running make sure to include the last slash in the data folder, for example: 
 # table <- importSTARgenecounts("/mnt/d/folder/")
 
-importSTARgenecounts <- function(data_folder) {
+# Most modern RNAseq is reverse stranded by the way
+
+importSTARgenecounts <- function(data_folder, strandedness) {
   
   library(tibble)
   library(readr)
@@ -17,15 +19,26 @@ importSTARgenecounts <- function(data_folder) {
   
   # This is a bit messy but does the job
   # It loads in the first values to make a tibble of the appropriate size
-  temp_STAR_table<-read_table(files[[1]],col_names = c('ensgene','total mapped','for mapped','rev mapped'))
+  temp_STAR_table<-read_table(files[[1]],col_names = c('ensgene','total.mapped','for.mapped','rev.mapped'))
   
   # Then it loads in all the rest
   for (name in names(files)) {
-    temp_STAR_table[name] <- read_table(files[name],col_names = c('ensgene','total mapped','for mapped','rev mapped'))$`rev mapped`
-  }
+    if (strandedness == 'reverse')
+    {
+      temp_STAR_table[name] <- read_table(files[name],col_names = c('ensgene','total.mapped','for.mapped','rev.mapped'))$rev.mapped
+      }
+    else if (strandedness == 'forward')
+    {
+      temp_STAR_table[name] <- read_table(files[name],col_names = c('ensgene','total.mapped','for.mapped','rev.mapped'))$for.mapped
+    }
+    else
+    {
+      stop('Please put \'reverse\' or \'forward\' for strandedness')
+    }
+    }
   
   # Then it removes the initialization stuff
-  STAR_table <- subset(temp_STAR_table,select=-c(`total mapped`,`for mapped`,`rev mapped`))
+  STAR_table <- subset(temp_STAR_table,select=-c(total.mapped,for.mapped,rev.mapped))
   
   # Then remove the N_data
   STAR_table <- STAR_table[-1:-4, ]

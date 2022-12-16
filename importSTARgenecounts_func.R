@@ -1,5 +1,5 @@
 # When running make sure to include the last slash in the data folder, for example: 
-# table <- importSTARgenecounts("/mnt/d/folder/")
+# table <- importSTARgenecounts("/mnt/d/folder/","reverse")
 
 # Most modern RNAseq is reverse stranded by the way
 
